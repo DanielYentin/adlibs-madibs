@@ -14,4 +14,10 @@
    * Users get to start with any amount of text and give the story a title.
    * Logged in users will be able to read any story they have contributed to on their homepage (the landing page after login).
 
+### Launch codes:
+
+`git clone git@github.com:DanielYentin/adlibs-madibs.git`
+
+`python3 app.py`
+
 ![alt text](flag.png "Flag")
