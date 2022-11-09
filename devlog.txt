@@ -1,9 +1,34 @@
-P00 by Team Success
+Success
+Daniel Yentin
+Ivan Yeung
+pd 2
+---------------------
+Making an web app that allow people to create stories, edit them, and then view them.
 
-IvanY DanielY-- 2022-11-02 6:36
+
+ ______   ______   __   __   __       ______   _______
+/_____/\ /_____/\ /_/\ /_/\ /_/\     /_____/\ /______/\
+\:::_ \ \\::::_\/_\:\ \\ \ \\:\ \    \:::_ \ \\::::__\/__
+ \:\ \ \ \\:\/___/\\:\ \\ \ \\:\ \    \:\ \ \ \\:\ /____/\
+  \:\ \ \ \\::___\/_\:\_/.:\ \\:\ \____\:\ \ \ \\:\\_  _\/
+   \:\/.:| |\:\____/\\ ..::/ / \:\/___/\\:\_\ \ \\:\_\ \ \
+    \____/_/ \_____\/ \___/_(   \_____\/ \_____\/ \_____\/
+==============================================================
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+fristL -- TIMESTAMP
+--------------------------------------------------------------
+
+IvanY DanielY-- 2022-11-02 18:36
 * Updated design doc based on edits made in class today
 * Gave descriptions for individual html files
 * Changed how our login and register works. Register will now be on its own separate page
 * Changed our component map to match our new system for registering an account
 * Added database representation in our component map and enlarged it in design doc so that it's legible
 * Went more in-depth on the task breakdown
+
+IvanY DanielY -- 2022-11-09 9:20
+* Spent class time porting code from sessions to project
+* implemented basic login function with hardcoded password and username
+* Started working on database and register.
