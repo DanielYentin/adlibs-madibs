@@ -66,7 +66,7 @@ def register():
     
 @app.route("/register/auth", methods=['GET', 'POST'])
 def register_auth():
-    return
+    return redirect("/login", 307)
 
 @app.route("/logout", methods=['GET', 'POST'])
 # this function is called by the logout button when it is pressed on the home page
