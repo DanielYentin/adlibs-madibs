@@ -1,0 +1,9 @@
+P00 by Team Success
+
+IvanY DanielY-- 2022-11-02 6:36
+* Updated design doc based on edits made in class today
+* Gave descriptions for individual html files
+* Changed how our login and register works. Register will now be on its own separate page
+* Changed our component map to match our new system for registering an account
+* Added database representation in our component map and enlarged it in design doc so that it's legible
+* Went more in-depth on the task breakdown
