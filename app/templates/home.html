@@ -1,29 +1,14 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Madlibs Adlibs</title>
-    </head>
-    <body>
-        <div class="info">
-            <div>Username: </div>
-            <div>Password: </div>
-        </div>
-        
-        <div class="options">
-            <div>
-                <button type="button" formaction="/create.html">Create a story</button> 
-            </div>
-            <div>
-                <button type="button" form="add" formaction="/add.html">Add to a story: </button> 
-                <select id="add"></select>
-            </div>
-            <div>
-                <button type="button" form="view" formaction="/view.html">View a story: </button> 
-                <select id="view">
-                    {% for item in collection %}
+<h1>
+  TEAM SUCCESS: Daniel Yentin, Ivan Yeung
+<h1>
+<h2>
+  Welcome to the response page. Congrats for successfully logging in!!!
+<h2>
 
-                </select>
-            </div>
-        </div>
-    </body>
+    <form action="/logout" method="post">
+        <input type="submit" name="submit" value="logout">
+    </form>
+
 </html>

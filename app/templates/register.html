@@ -19,7 +19,7 @@
 <html>
 
   <head>
-    <title> LOGIN PAGE </title>
+    <title> REGISTER PAGE </title>
   </head>
 
   <body>
@@ -27,22 +27,22 @@
       TEAM SUCCESS: Daniel Yentin, Ivan Yeung
     <h1>
     <h3>
-      Enter your username and password below to proceed.
+      Enter a username and password below to proceed.
     </h3>
     <div>
-      <form action="/login/auth" method ='POST'>
+      <form action="/register/auth" method ='POST'>
         USERNAME: <input type="text" name="username">
         <br>
         PASSWORD: <input type="text" name="password">
         <br>
-        <input type="submit" name="submit" value="login">
+        <input type="submit" name="submit" value="register">
       </form>
       <br>
     </div>
     <div>
-      Dont have an account?
-      <form action="/register" method ='POST'>
-        <input type="submit" name="submit" value="register">
+      Already have an account? 
+      <form action="/login" method ='POST'>
+        <input type="submit" name="submit" value="login">
       </form>
     </div>
   </body>
