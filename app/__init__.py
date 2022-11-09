@@ -66,6 +66,7 @@ def register():
     
 @app.route("/register/auth", methods=['GET', 'POST'])
 def register_auth():
+    db
     return redirect("/login", 307)
 
 @app.route("/logout", methods=['GET', 'POST'])
