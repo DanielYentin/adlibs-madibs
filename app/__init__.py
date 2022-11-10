@@ -136,8 +136,10 @@ def publish():
     body = request.form["body"]
     publisher = session["username"]
 
+    # store story in stories table
     c.execute("INSERT INTO TABLE stories(title, body, publisher) VALUES({title}, {body}, {publisher})")
     
+    # store story history in story table
     c.execute("CREATE TABLE {title}(contributors TEXT, contributions TEXT)")
     c.execute("INSERT INTO {title}({publisher}, {body})")
 
