@@ -4,7 +4,7 @@
 # Launch Codes:
 
 1. Clone this repo:
-`git clone `
+`git clone git@github.com:DanielYentin/adlibs-madibs.git`
 
 2. Cd into the directory:
 `cd adlibs-madlibs/`
