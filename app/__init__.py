@@ -133,15 +133,23 @@ def publish():
     c = db.cursor()
 
     title = request.form["title"]
+    # if (title already exists dont do anything):
+    #     print("***DIAG: title was not available***")
+
     body = request.form["body"]
+    if (len(body) == 0):
+        print("***DIAG: body cannot be empty***")
+    if (len(body) > 200):
+        print("***DIAG: body cannot be greater than 200 characters***")
+
     publisher = session["username"]
 
     # store story in stories table
-    c.execute("INSERT INTO TABLE stories(title, body, publisher) VALUES({title}, {body}, {publisher})")
+    c.execute(f"INSERT INTO TABLE stories(title, body, publisher) VALUES({title}, {body}, {publisher})")
     
     # store story history in story table
-    c.execute("CREATE TABLE {title}(contributors TEXT, contributions TEXT)")
-    c.execute("INSERT INTO {title}({publisher}, {body})")
+    c.execute(f"CREATE TABLE {title}(contributors TEXT, contributions TEXT)")
+    c.execute(f"INSERT INTO {title}({publisher}, {body})")
 
     db.commit()
     return redirect("/home", 307)
