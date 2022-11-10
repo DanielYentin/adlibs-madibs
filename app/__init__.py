@@ -88,6 +88,10 @@ def register_auth():
     username = request.form["username"]
     password = request.form["password"]
 
+    if " " in username:
+        print("***DIAG: username invalid, contains space***")
+        return redirect("/register", 307)
+
     db = sqlite3.connect(DB_FILE)
     c = db.cursor()
 
@@ -118,6 +122,14 @@ def logout():
 @app.route("/home", methods=['GET', 'POST'])
 def home():
     return render_template('home.html')
+
+@app.route("/create", methods=['GET', 'POST'])
+def create():
+    return render_template('create.html')
+
+@app.route("/publish", methods=['GET', 'POST'])
+def publish():
+    return render_template('create.html')
 
 if __name__ == "__main__": #false if this file imported as module
     #enable debugging, auto-restarting of server when this file is modified
