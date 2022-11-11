@@ -23,6 +23,11 @@ from flask import *
 app = Flask(__name__)    #create Flask object
 app.secret_key = b"\xdcG4g\xebL\x98m\xacX\x03\x13\xef\xfeF0#\x07P\x07JN\xf1P|'\x9ak\x1f\xe2\xf2?"
 
+def sql():
+    db = sqlite3.connect(DB_FILE)
+    c = db.cursor()
+    return db, c
+
 def p_redirect(url: str):
     '''
     flask redirect using post (307)
@@ -51,13 +56,14 @@ def login_auth():
     form_username = request.form["username"]
     form_password = request.form["password"]
 
-    db = sqlite3.connect(DB_FILE)
-    c = db.cursor()
+    db, c = sql()
+    # db = sqlite3.connect(DB_FILE)
+    # c = db.cursor()
 
     print(form_username)
     c.execute("SELECT * FROM users WHERE username = ?", (form_username,))
     users = c.fetchall()
-    print(users)
+
     if len(users) == 1:
         user = users[0]
         db_username = user[1]
@@ -92,8 +98,8 @@ def register():
 
 @app.route("/register/auth", methods=['GET', 'POST'])
 def register_auth():
-    db = sqlite3.connect(DB_FILE)
-    c = db.cursor()
+    db, c = sql()
+
     c.execute("SELECT * FROM users")
     next_available_uid = len(c.fetchall())
     print(next_available_uid)
@@ -133,8 +139,7 @@ def create():
 
 @app.route("/publish", methods=['GET', 'POST'])
 def publish():
-    db = sqlite3.connect(DB_FILE)
-    c = db.cursor()
+    db, c = sql()
 
     title = request.form["title"]
     # if (title already exists dont do anything):
@@ -163,8 +168,7 @@ def publish():
 
 if __name__ == "__main__": #false if this file imported as module
     #enable debugging, auto-restarting of server when this file is modified
-    db = sqlite3.connect(DB_FILE)
-    c = db.cursor()
+    db, c = sql()
 
     #table storing usernames and passwords
     c.execute("CREATE TABLE IF NOT EXISTS users(uid INT, username TEXT, password TEXT)")
