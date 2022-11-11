@@ -32,3 +32,13 @@ IvanY DanielY -- 2022-11-09 9:20
 * Spent class time porting code from sessions to project
 * implemented basic login function with hardcoded password and username
 * Started working on database and register.
+
+IvanY DanielY -- 2022-11-09 19:37
+* Created tables when __init__.py is first run
+* Finished register(only enters information into database if username is not already taken)
+* if username is already taken, user stays on register page
+* if registration is successful, user is directed to login page
+* Finished login (only lets people if username exists in database and the password matches with the stored password)
+* if one of the conditions for logging in is not met, user stays on login page
+* if login is successful user is redirected to home page
+* Finished cookie functionality which automatically directs you to home(landing) page if you logged in and didn't log out
