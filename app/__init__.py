@@ -144,12 +144,12 @@ def publish():
 
     publisher = session["username"]
 
-    # store story in stories table
-    c.execute(f"INSERT INTO TABLE stories(title, body, publisher) VALUES({title}, {body}, {publisher})")
+    # store story in stories table'
+    c.execute(f"INSERT INTO stories(title, body, publisher) VALUES('{title}', '{body}', '{publisher}')")
     
     # store story history in story table
     c.execute(f"CREATE TABLE {title}(contributors TEXT, contributions TEXT)")
-    c.execute(f"INSERT INTO {title}({publisher}, {body})")
+    c.execute(f"INSERT INTO {title}(contributors, contributions) VALUES('{publisher}', '{body}')")
 
     db.commit()
     return redirect("/home", 307)
@@ -162,7 +162,7 @@ if __name__ == "__main__": #false if this file imported as module
     #table storing usernames and passwords
     c.execute("CREATE TABLE IF NOT EXISTS users(username TEXT, password TEXT)")
     #table storing info on stories
-    c.execute("CREATE TABLE IF NOT EXISTS stories(title TEXT, publisher TEXT, body TEXT)")
+    c.execute("CREATE TABLE IF NOT EXISTS stories(title TEXT, body TEXT, publisher TEXT)")
 
     db.commit()
 
