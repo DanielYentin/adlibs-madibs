@@ -14,7 +14,7 @@ from flask import *
 # from flask import render_template   #facilitate jinja templating
 # from flask import request           #facilitate form submission
 # from flask import session           #facilitate form submission
-# from flask import redirect           #facilitate form submission
+# from flask import p_redirect           #facilitate form submission
 # from flask import url_for
 
 #the conventional way:
@@ -22,6 +22,12 @@ from flask import *
 
 app = Flask(__name__)    #create Flask object
 app.secret_key = b"\xdcG4g\xebL\x98m\xacX\x03\x13\xef\xfeF0#\x07P\x07JN\xf1P|'\x9ak\x1f\xe2\xf2?"
+
+def p_redirect(url: str):
+    '''
+    flask redirect using post (307)
+    '''
+    return redirect(url, 307)
 
 @app.route("/", methods=['GET', 'POST'])
 def root():
@@ -31,10 +37,10 @@ def root():
     #checks if cookie has username and password stored
     if ('username' in session):
         print("***DIAG: user has already logged  ***")
-        return redirect("/home", 307)
+        return p_redirect("/home")
     else:
         #returns login page if cookie does not have that information
-        return redirect("/login", 307)
+        return p_redirect("/login")
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -65,17 +71,17 @@ def login_auth():
                 print("***DIAG: password matches ***")
                 #when both coditions are met, password is stored in the cookie and the home page is rendered
                 session["username"] = form_username
-                return redirect("/home", 307)
+                return p_redirect("/home")
 
             print("***DIAG: password did not match ***")
-            return redirect("/login", 307)
+            return p_redirect("/login")
 
         print("***DIAG: username did not match ***")
-        return redirect("/login", 307)
+        return p_redirect("/login")
 
     elif len(users) == 0:
         print("***DIAG: account does not exist ***")
-        return redirect("/login", 307)
+        return p_redirect("/login")
 
     else:
         return "YOU ARE A FAILURE AT CODING, GET A NEW JOB"
@@ -104,10 +110,10 @@ def register_auth():
         c.execute("INSERT INTO users(uid, username, password) VALUES(?, ?, ?)", (next_available_uid, username, password))
         c.execute(f"CREATE TABLE uid_{next_available_uid}(stories TEXT)")
         db.commit()
-        return redirect("/login", 307)
+        return p_redirect("/login")
 
     print("***DIAG: username was not available***")
-    return redirect("/register", 307)
+    return p_redirect("/register")
 
 @app.route("/logout", methods=['GET', 'POST'])
 # this function is called by the logout button when it is pressed on the home page
@@ -115,7 +121,7 @@ def logout():
     #cookie holding password is removed
     session.pop("username")
     print("***DIAG: password removed from cookie ***")
-    return redirect("/login", 307)
+    return p_redirect("/login")
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
@@ -152,7 +158,8 @@ def publish():
     print("***DIAG: story's history inserted into database***")
 
     db.commit()
-    return redirect("/home", 307)
+    return p_redirect("/home")
+
 
 if __name__ == "__main__": #false if this file imported as module
     #enable debugging, auto-restarting of server when this file is modified
@@ -163,8 +170,6 @@ if __name__ == "__main__": #false if this file imported as module
     c.execute("CREATE TABLE IF NOT EXISTS users(uid INT, username TEXT, password TEXT)")
     #table storing info on stories
     c.execute("CREATE TABLE IF NOT EXISTS stories(title TEXT, body TEXT, publisher TEXT)")
-
-
 
     db.commit()
 
