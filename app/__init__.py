@@ -48,13 +48,14 @@ def login_auth():
     db = sqlite3.connect(DB_FILE)
     c = db.cursor()
 
-    c.execute(f"SELECT * FROM users WHERE username = '{form_username}'")
+    print(form_username)
+    c.execute("SELECT * FROM users WHERE username = ?", (form_username,))
     users = c.fetchall()
-
+    print(users)
     if len(users) == 1:
         user = users[0]
-        db_username = user[0]
-        db_password = user[1]
+        db_username = user[1]
+        db_password = user[2]
 
         if (form_username == db_username):
             print("***DIAG: username matches ***")
@@ -85,26 +86,23 @@ def register():
 
 @app.route("/register/auth", methods=['GET', 'POST'])
 def register_auth():
+    db = sqlite3.connect(DB_FILE)
+    c = db.cursor()
+    c.execute("SELECT * FROM users")
+    next_available_uid = len(c.fetchall())
+    print(next_available_uid)
+
     username = request.form["username"]
     password = request.form["password"]
 
-    if " " in username:
-        print("***DIAG: username invalid, contains space***")
-        return redirect("/register", 307)
-
-    db = sqlite3.connect(DB_FILE)
-    c = db.cursor()
-
     #checks if inputted username exists
-    c.execute(f"SELECT username FROM users WHERE username = '{username}'")
+    c.execute(f"SELECT username FROM users WHERE username = ?", (username,))
     usernames = c.fetchall()
 
     if len(usernames) == 0:
         print("***DIAG: username was available***")
-        c.execute(f"INSERT INTO users(username, password) VALUES('{username}', '{password}')")
-
-        c.execute(f"CREATE TABLE {username}(stories TEXT)")
-
+        c.execute("INSERT INTO users(uid, username, password) VALUES(?, ?, ?)", (next_available_uid, username, password))
+        c.execute(f"CREATE TABLE uid_{next_available_uid}(stories TEXT)")
         db.commit()
         return redirect("/login", 307)
 
@@ -145,11 +143,13 @@ def publish():
     publisher = session["username"]
 
     # store story in stories table'
-    c.execute(f"INSERT INTO stories(title, body, publisher) VALUES('{title}', '{body}', '{publisher}')")
-    
+    c.execute(f"INSERT INTO stories(title, body, publisher) VALUES(?, ?, ?)", (title, body, publisher))
+    print("***DIAG: story inserted into database***")
+
     # store story history in story table
     c.execute(f"CREATE TABLE {title}(contributors TEXT, contributions TEXT)")
-    c.execute(f"INSERT INTO {title}(contributors, contributions) VALUES('{publisher}', '{body}')")
+    c.execute(f"INSERT INTO {title}(contributors, contributions) VALUES(?, ?)", (publisher, body))
+    print("***DIAG: story's history inserted into database***")
 
     db.commit()
     return redirect("/home", 307)
@@ -160,9 +160,11 @@ if __name__ == "__main__": #false if this file imported as module
     c = db.cursor()
 
     #table storing usernames and passwords
-    c.execute("CREATE TABLE IF NOT EXISTS users(username TEXT, password TEXT)")
+    c.execute("CREATE TABLE IF NOT EXISTS users(uid INT, username TEXT, password TEXT)")
     #table storing info on stories
     c.execute("CREATE TABLE IF NOT EXISTS stories(title TEXT, body TEXT, publisher TEXT)")
+
+
 
     db.commit()
 
@@ -170,4 +172,3 @@ if __name__ == "__main__": #false if this file imported as module
     app.run()
 
     db.close()
-
