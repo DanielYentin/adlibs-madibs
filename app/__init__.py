@@ -88,6 +88,10 @@ def register_auth():
     username = request.form["username"]
     password = request.form["password"]
 
+    if " " in username:
+        print("***DIAG: username invalid, contains space***")
+        return redirect("/register", 307)
+
     db = sqlite3.connect(DB_FILE)
     c = db.cursor()
 
@@ -97,7 +101,7 @@ def register_auth():
 
     if len(usernames) == 0:
         print("***DIAG: username was available***")
-        c.execute(f"INSERT INTO users (username, password) VALUES('{username}', '{password}')")
+        c.execute(f"INSERT INTO users(username, password) VALUES('{username}', '{password}')")
 
         c.execute(f"CREATE TABLE {username}(stories TEXT)")
 
@@ -119,6 +123,37 @@ def logout():
 def home():
     return render_template('home.html')
 
+@app.route("/create", methods=['GET', 'POST'])
+def create():
+    return render_template('create.html')
+
+@app.route("/publish", methods=['GET', 'POST'])
+def publish():
+    db = sqlite3.connect(DB_FILE)
+    c = db.cursor()
+
+    title = request.form["title"]
+    # if (title already exists dont do anything):
+    #     print("***DIAG: title was not available***")
+
+    body = request.form["body"]
+    if (len(body) == 0):
+        print("***DIAG: body cannot be empty***")
+    if (len(body) > 200):
+        print("***DIAG: body cannot be greater than 200 characters***")
+
+    publisher = session["username"]
+
+    # store story in stories table'
+    c.execute(f"INSERT INTO stories(title, body, publisher) VALUES('{title}', '{body}', '{publisher}')")
+    
+    # store story history in story table
+    c.execute(f"CREATE TABLE {title}(contributors TEXT, contributions TEXT)")
+    c.execute(f"INSERT INTO {title}(contributors, contributions) VALUES('{publisher}', '{body}')")
+
+    db.commit()
+    return redirect("/home", 307)
+
 if __name__ == "__main__": #false if this file imported as module
     #enable debugging, auto-restarting of server when this file is modified
     db = sqlite3.connect(DB_FILE)
@@ -127,7 +162,7 @@ if __name__ == "__main__": #false if this file imported as module
     #table storing usernames and passwords
     c.execute("CREATE TABLE IF NOT EXISTS users(username TEXT, password TEXT)")
     #table storing info on stories
-    c.execute("CREATE TABLE IF NOT EXISTS stories(title TEXT, creator TEXT, body TEXT, latest_contribution TEXT)")
+    c.execute("CREATE TABLE IF NOT EXISTS stories(title TEXT, body TEXT, publisher TEXT)")
 
     db.commit()
 
@@ -135,3 +170,4 @@ if __name__ == "__main__": #false if this file imported as module
     app.run()
 
     db.close()
+
