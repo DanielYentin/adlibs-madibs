@@ -42,3 +42,12 @@ IvanY DanielY -- 2022-11-09 19:37
 * if one of the conditions for logging in is not met, user stays on login page
 * if login is successful user is redirected to home page
 * Finished cookie functionality which automatically directs you to home(landing) page if you logged in and didn't log out
+
+IvanY DanielY -- 2022-11-10 9:20
+*Updated readme to assignment and filled in requirments.txt
+
+IvanY DanielY -- 2022-11-10 10:18
+* replace use of f strings to put variables in the commands with the sqlite3 ? instead
+* finished the @app.route("/create")
+* added a user id system that is added when a new user registers
+* user id system prevents malicious user name when we make dynamically make tables based on usernames
