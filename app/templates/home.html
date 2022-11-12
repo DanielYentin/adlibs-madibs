@@ -15,12 +15,15 @@
         <input type="submit" name="submit" value="logout">
     </form>
 
+    {% for i in range(3) %}
+      <br>
+    {% endfor %}
+
     {% for title in titles %}
       <form action="/view" method="post">
         <input type="hidden" name="title" value={{title}}>
         <input type="submit" name="submit" value={{title}}>
       </form>
-       <!-- <a href="/view">{{ title }}</a><br> -->
     {% endfor %}
   </body>
 </html>

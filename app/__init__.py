@@ -42,12 +42,17 @@ def root():
     print("***DIAG: this Flask obj ***")
     print(app)
     #checks if cookie has username and password stored
+    db, c = sql()
+
     if ('username' in session):
-        print("***DIAG: user has already logged  ***")
-        return p_redirect("/home")
-    else:
-        #returns login page if cookie does not have that information
-        return p_redirect("/login")
+        c.execute("SELECT * FROM users WHERE username = ?", (session["username"],))
+        users = c.fetchall()
+        if (len(users) != 0):
+            print("***DIAG: user has already logged  ***")
+            return p_redirect("/home")
+
+    #returns login page if cookie does not have that information
+    return p_redirect("/login")
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -77,7 +82,7 @@ def login_auth():
 
             if (form_password == db_password):
                 print("***DIAG: password matches ***")
-                #when both coditions are met, password is stored in the cookie and the home page is rendered
+                #when both coditions are met, password is stored in the cookie and the home page is
                 session["username"] = form_username
                 return p_redirect("/home")
 
@@ -116,7 +121,7 @@ def register_auth():
     if len(usernames) == 0:
         print("***DIAG: username was available***")
         c.execute("INSERT INTO users(uid, username, password) VALUES(?, ?, ?)", (next_available_uid, username, password))
-        c.execute(f"CREATE TABLE uid_{next_available_uid}(stories TEXT)")
+        c.execute(f"CREATE TABLE uid_{next_available_uid}(title TEXT)")
         db.commit()
         return p_redirect("/login")
 
@@ -134,7 +139,11 @@ def logout():
 @app.route("/home", methods=['GET', 'POST'])
 def home():
     db, c = sql()
-    c.execute("SELECT title FROM stories")
+
+    c.execute("SELECT * FROM users WHERE username = ?", (session["username"],))
+
+    uid = c.fetchall()[0][0]
+    c.execute(f"SELECT title FROM uid_{uid}")
     titles = c.fetchall()
 
     for i in range(len(titles)):
@@ -180,6 +189,11 @@ def publish():
         c.execute(f"INSERT INTO sid_{next_available_sid}(contributors, contributions) VALUES(?, ?)", (publisher, body))
         print("***DIAG: story's history inserted into database***")
 
+        c.execute("SELECT * FROM users WHERE username = ?", (session["username"],))
+        uid = c.fetchall()[0][0]
+        print(uid)
+        c.execute(f"INSERT INTO uid_{uid}(title) VALUES(?)", (title,))
+
         db.commit()
         return p_redirect("/home")
 
@@ -203,6 +217,7 @@ def view():
 
 if __name__ == "__main__": #false if this file imported as module
     #enable debugging, auto-restarting of server when this file is modified
+    # session.pop("username", None)
     db, c = sql()
 
     #table storing usernames and passwords
