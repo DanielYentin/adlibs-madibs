@@ -133,7 +133,16 @@ def logout():
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-    return render_template('home.html')
+    db, c = sql()
+    c.execute("SELECT title FROM stories")
+    titles = c.fetchall()
+
+    for i in range(len(titles)):
+        title = titles[i][0]
+        titles[i] = title
+
+    print(f"titles: {titles}")
+    return render_template('home.html', titles=titles)
 
 @app.route("/create", methods=['GET', 'POST'])
 def create():
@@ -177,6 +186,20 @@ def publish():
     print("***DIAG: title was not available***")
     return NOTHING #return statement doing nothing
     # display error syaing title is not unique
+
+@app.route("/view", methods=['GET', 'POST'])
+def view():
+    title = request.form["title"] #passed in from the hidden form
+
+    db, c = sql()
+    c.execute("SELECT * FROM stories WHERE title = ?", (title,))
+    info = c.fetchall()[0]
+    print(info)
+
+    title = info[0]
+    body = info[1]
+    publisher = info[2]
+    return render_template('view.html', title=title, body=body, publisher=publisher)
 
 if __name__ == "__main__": #false if this file imported as module
     #enable debugging, auto-restarting of server when this file is modified
