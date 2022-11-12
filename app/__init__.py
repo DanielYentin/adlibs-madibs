@@ -22,6 +22,8 @@ from flask import *
 
 app = Flask(__name__)    #create Flask object
 app.secret_key = b"\xdcG4g\xebL\x98m\xacX\x03\x13\xef\xfeF0#\x07P\x07JN\xf1P|'\x9ak\x1f\xe2\xf2?"
+NOTHING = ("", 204)
+
 
 def sql():
     db = sqlite3.connect(DB_FILE)
@@ -146,29 +148,35 @@ def publish():
     print(f"next_available_sid: {next_available_sid}") #sid = story id
 
     title = request.form["title"]
-    # if (title already exists dont do anything):
-    #     print("***DIAG: title was not available***")
 
-    body = request.form["body"]
-    if (len(body) == 0):
-        print("***DIAG: body cannot be empty***")
-    if (len(body) > 200):
-        print("***DIAG: body cannot be greater than 200 characters***")
+    c.execute("SELECT title FROM stories WHERE title = ?", (title,))
+    titles = c.fetchall()
+    if (len(titles) == 0):
+        print("***DIAG: title was available***")
 
-    publisher = session["username"]
+        body = request.form["body"]
+        if (len(body) == 0):
+            print("***DIAG: body cannot be empty***")
+        if (len(body) > 200):
+            print("***DIAG: body cannot be greater than 200 characters***")
 
-    # store story in stories table'
-    c.execute(f"INSERT INTO stories(title, body, publisher) VALUES(?, ?, ?)", (title, body, publisher))
-    print("***DIAG: story inserted into database***")
+        publisher = session["username"]
 
-    # store story history in story table
-    c.execute(f"CREATE TABLE sid_{next_available_sid}(contributors TEXT, contributions TEXT)")
-    c.execute(f"INSERT INTO sid_{next_available_sid}(contributors, contributions) VALUES(?, ?)", (publisher, body))
-    print("***DIAG: story's history inserted into database***")
+        # store story in stories table'
+        c.execute(f"INSERT INTO stories(title, body, publisher) VALUES(?, ?, ?)", (title, body, publisher))
+        print("***DIAG: story inserted into database***")
 
-    db.commit()
-    return p_redirect("/home")
+        # store story history in story table
+        c.execute(f"CREATE TABLE sid_{next_available_sid}(contributors TEXT, contributions TEXT)")
+        c.execute(f"INSERT INTO sid_{next_available_sid}(contributors, contributions) VALUES(?, ?)", (publisher, body))
+        print("***DIAG: story's history inserted into database***")
 
+        db.commit()
+        return p_redirect("/home")
+
+    print("***DIAG: title was not available***")
+    return NOTHING #return statement doing nothing
+    # display error syaing title is not unique
 
 if __name__ == "__main__": #false if this file imported as module
     #enable debugging, auto-restarting of server when this file is modified
