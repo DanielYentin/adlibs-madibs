@@ -141,6 +141,10 @@ def create():
 def publish():
     db, c = sql()
 
+    c.execute("SELECT * FROM stories")
+    next_available_sid = len(c.fetchall())
+    print(f"next_available_sid: {next_available_sid}") #sid = story id
+
     title = request.form["title"]
     # if (title already exists dont do anything):
     #     print("***DIAG: title was not available***")
@@ -158,8 +162,8 @@ def publish():
     print("***DIAG: story inserted into database***")
 
     # store story history in story table
-    c.execute(f"CREATE TABLE {title}(contributors TEXT, contributions TEXT)")
-    c.execute(f"INSERT INTO {title}(contributors, contributions) VALUES(?, ?)", (publisher, body))
+    c.execute(f"CREATE TABLE sid_{next_available_sid}(contributors TEXT, contributions TEXT)")
+    c.execute(f"INSERT INTO sid_{next_available_sid}(contributors, contributions) VALUES(?, ?)", (publisher, body))
     print("***DIAG: story's history inserted into database***")
 
     db.commit()
