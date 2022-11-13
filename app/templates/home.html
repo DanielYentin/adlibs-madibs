@@ -15,11 +15,26 @@
         <input type="submit" name="submit" value="logout">
     </form>
 
+    <h2>ADD TO:</h2>
+
     {% for i in range(3) %}
       <br>
     {% endfor %}
 
-    {% for title in titles %}
+    {% for title in add %}
+      <form action="/add" method="post">
+        <input type="hidden" name="title" value={{title}}>
+        <input type="submit" name="submit" value={{title}}>
+      </form>
+    {% endfor %}
+
+    <h2>VIEW:</h2>
+
+    {% for i in range(3) %}
+      <br>
+    {% endfor %}
+
+    {% for title in view %}
       <form action="/view" method="post">
         <input type="hidden" name="title" value={{title}}>
         <input type="submit" name="submit" value={{title}}>

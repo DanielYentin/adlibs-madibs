@@ -36,6 +36,21 @@ def p_redirect(url: str):
     '''
     return redirect(url, 307)
 
+#finds uid based on username passed in
+def find_uid(username):
+    db, c = sql()
+    c.execute("SELECT * FROM users WHERE username = ?", (username,))
+    uid = c.fetchall()[0][0]
+    return uid
+
+#finds sid based on title passed in
+def find_sid(title):
+    db, c = sql()
+    c.execute("SELECT * FROM stories WHERE title = ?", (title,))
+
+    sid = c.fetchall()[0][0]
+    return sid
+
 @app.route("/", methods=['GET', 'POST'])
 def root():
     print("\n\n\n")
@@ -140,18 +155,28 @@ def logout():
 def home():
     db, c = sql()
 
-    c.execute("SELECT * FROM users WHERE username = ?", (session["username"],))
+    # view
 
-    uid = c.fetchall()[0][0]
+    uid = find_uid(session["username"])
     c.execute(f"SELECT title FROM uid_{uid}")
-    titles = c.fetchall()
+    view = c.fetchall()
 
-    for i in range(len(titles)):
-        title = titles[i][0]
-        titles[i] = title
+    for i in range(len(view)):
+        title = view[i][0]
+        view[i] = title
 
-    print(f"titles: {titles}")
-    return render_template('home.html', titles=titles)
+    # add
+    c.execute(f"SELECT title FROM stories")
+    add = c.fetchall()
+
+    for i in range(len(add)):
+        title = add[i][0]
+        add[i] = title
+
+    #filters out stories that user has contributed to from all the stories
+    add = list(filter(lambda i: i not in view, add))
+
+    return render_template('home.html', add=add, view=view)
 
 @app.route("/create", methods=['GET', 'POST'])
 def create():
@@ -181,16 +206,15 @@ def publish():
         publisher = session["username"]
 
         # store story in stories table'
-        c.execute(f"INSERT INTO stories(title, body, publisher) VALUES(?, ?, ?)", (title, body, publisher))
+        c.execute(f"INSERT INTO stories(sid, title, body, publisher) VALUES(?, ?, ?, ?)", (next_available_sid, title, body, publisher))
         print("***DIAG: story inserted into database***")
 
         # store story history in story table
-        c.execute(f"CREATE TABLE sid_{next_available_sid}(contributors TEXT, contributions TEXT)")
-        c.execute(f"INSERT INTO sid_{next_available_sid}(contributors, contributions) VALUES(?, ?)", (publisher, body))
+        c.execute(f"CREATE TABLE sid_{next_available_sid}(contributor TEXT, contribution TEXT)")
+        c.execute(f"INSERT INTO sid_{next_available_sid}(contributor, contribution) VALUES(?, ?)", (publisher, body))
         print("***DIAG: story's history inserted into database***")
 
-        c.execute("SELECT * FROM users WHERE username = ?", (session["username"],))
-        uid = c.fetchall()[0][0]
+        uid = find_uid(session["username"])
         print(uid)
         c.execute(f"INSERT INTO uid_{uid}(title) VALUES(?)", (title,))
 
@@ -201,6 +225,51 @@ def publish():
     return NOTHING #return statement doing nothing
     # display error syaing title is not unique
 
+
+@app.route("/add", methods=['GET', 'POST'])
+def add():
+    title = request.form["title"] #passed in from the hidden form
+
+    db, c = sql()
+    c.execute("SELECT * FROM stories WHERE title = ?", (title,))
+    info = c.fetchall()[0]
+    print(f"info: {info}")
+    title = info[1]
+    print(f"title: {title}")
+    sid = find_sid(title)
+    c.execute(f"SELECT contribution FROM sid_{sid}")
+    latest_contribution = c.fetchall()[-1][0]
+
+    print("publisher: {publisher}")
+    publisher = info[3]
+    return render_template('add.html', title=title, latest_contribution=latest_contribution, publisher=publisher)
+
+@app.route("/save", methods=['GET', 'POST'])
+def save():
+    db, c = sql()
+
+    contributor = session["username"]
+    title = request.form["title"]
+    contribution = request.form["contribution"]
+    if (len(contribution) == 0):
+        print("***DIAG: body cannot be empty***")
+    if (len(contribution) > 200):
+        print("***DIAG: body cannot be greater than 200 characters***")
+
+    uid = find_uid(session["username"])
+    c.execute(f"INSERT INTO uid_{uid}(title) VALUES(?)", (title,))
+    print(f"title {title}")
+    sid = find_sid(title)
+    c.execute(f"INSERT INTO sid_{sid}(contributor, contribution) VALUES(?, ?)", (contributor, contribution))
+
+    c.execute("SELECT body FROM stories WHERE title = ?", (title,))
+    body = c.fetchall()[0][0]
+    c.execute("UPDATE stories SET body = ? WHERE title = ?", (body+" "+contribution, title))
+
+    db.commit()
+    return p_redirect("/home")
+
+
 @app.route("/view", methods=['GET', 'POST'])
 def view():
     title = request.form["title"] #passed in from the hidden form
@@ -210,9 +279,9 @@ def view():
     info = c.fetchall()[0]
     print(info)
 
-    title = info[0]
-    body = info[1]
-    publisher = info[2]
+    title = info[1]
+    body = info[2]
+    publisher = info[3]
     return render_template('view.html', title=title, body=body, publisher=publisher)
 
 if __name__ == "__main__": #false if this file imported as module
@@ -223,7 +292,7 @@ if __name__ == "__main__": #false if this file imported as module
     #table storing usernames and passwords
     c.execute("CREATE TABLE IF NOT EXISTS users(uid INT, username TEXT, password TEXT)")
     #table storing info on stories
-    c.execute("CREATE TABLE IF NOT EXISTS stories(title TEXT, body TEXT, publisher TEXT)")
+    c.execute("CREATE TABLE IF NOT EXISTS stories(sid INT, title TEXT, body TEXT, publisher TEXT)")
 
     db.commit()
 
