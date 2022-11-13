@@ -58,3 +58,11 @@ IvanY DanielY -- 2022-11-10 21:34
 * when user clicks on button of story, they can view that story in the /view page and the information is transferred through post request
 * made view only display the stories contributed to by the user instead of all existing stories
 * added contingency check to make sure username stored in session cookie actually exists
+
+IvanY -- 2022-11-10 21:54
+* added latest updated design doc to repo
+
+IvanY DanielY -- 2022-11-10 21:08
+* Made helper functions to find uid and sid
+* created the add functionality where user can add to stories they haven't contributed to yet
+* made add.html only show the user the latest contribution to the story they are editing
