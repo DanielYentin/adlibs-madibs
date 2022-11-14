@@ -52,17 +52,22 @@ IvanY DanielY -- 2022-11-10 22:18
 * added a user id system that is added when a new user registers
 * user id system prevents malicious user name when we make dynamically make tables based on usernames
 
-IvanY DanielY -- 2022-11-10 21:34
+IvanY DanielY -- 2022-11-11 21:34
 * added sid(story id) system for the stories to prevent malicious story names
 * created buttons in home page for each story that user can view
 * when user clicks on button of story, they can view that story in the /view page and the information is transferred through post request
 * made view only display the stories contributed to by the user instead of all existing stories
 * added contingency check to make sure username stored in session cookie actually exists
 
-IvanY -- 2022-11-10 21:54
+IvanY -- 2022-11-11 21:54
 * added latest updated design doc to repo
 
-IvanY DanielY -- 2022-11-10 21:08
+IvanY DanielY -- 2022-11-12 21:08
 * Made helper functions to find uid and sid
 * created the add functionality where user can add to stories they haven't contributed to yet
 * made add.html only show the user the latest contribution to the story they are editing
+
+IvanY DanielY -- 2022-11-13 21:30
+* Removed the sql() function and only opened the database and established the cursor at the beginning of the code
+* Added the option for user to be remembered after logging out on the login screen
+* Added an error system that displays it to the user such as an incorrect password

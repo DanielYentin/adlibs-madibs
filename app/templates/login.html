@@ -33,9 +33,13 @@
       <form action="/login/auth" method ='POST'>
         USERNAME: <input type="text" name="username" placeholder="username" required><br>
         PASSWORD: <input type="text" name="password" placeholder="password" required><br>
+        Stay logged in? <input type="checkbox" name="stay_logged_in">
         <input type="submit" name="submit" value="login">
       </form>
       <br>
+      {% if error %}
+        ERROR: {{ error }}
+      {% endif %}
     </div>
     <div>
       Dont have an account?

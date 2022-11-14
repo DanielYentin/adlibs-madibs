@@ -25,10 +25,9 @@ app.secret_key = b"\xdcG4g\xebL\x98m\xacX\x03\x13\xef\xfeF0#\x07P\x07JN\xf1P|'\x
 NOTHING = ("", 204)
 
 
-def sql():
-    db = sqlite3.connect(DB_FILE)
-    c = db.cursor()
-    return db, c
+db = sqlite3.connect(DB_FILE, check_same_thread=False)
+c = db.cursor()
+
 
 def p_redirect(url: str):
     '''
@@ -38,49 +37,49 @@ def p_redirect(url: str):
 
 #finds uid based on username passed in
 def find_uid(username):
-    db, c = sql()
+    '''
+    returns uid of username
+    '''
     c.execute("SELECT * FROM users WHERE username = ?", (username,))
     uid = c.fetchall()[0][0]
     return uid
 
 #finds sid based on title passed in
 def find_sid(title):
-    db, c = sql()
     c.execute("SELECT * FROM stories WHERE title = ?", (title,))
-
     sid = c.fetchall()[0][0]
     return sid
 
 @app.route("/", methods=['GET', 'POST'])
 def root():
-    print("\n\n\n")
+    session.pop("error", "")
+    print("\n\n\n"),
     print("***DIAG: this Flask obj ***")
     print(app)
     #checks if cookie has username and password stored
-    db, c = sql()
 
-    if ('username' in session):
-        c.execute("SELECT * FROM users WHERE username = ?", (session["username"],))
-        users = c.fetchall()
-        if (len(users) != 0):
-            print("***DIAG: user has already logged  ***")
-            return p_redirect("/home")
+    if ('stay_logged_in' in session):
+        if (session['stay_logged_in'] == True):
+            c.execute("SELECT * FROM users WHERE username = ?", (session["username"],))
+            users = c.fetchall()
+            if (len(users) != 0):
+                print("***DIAG: user has already logged and checked the button to stay logged in***")
+                return p_redirect("/home")
 
     #returns login page if cookie does not have that information
     return p_redirect("/login")
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    return render_template('login.html', error=session.get("error", ""))
 
 @app.route("/login/auth", methods=['GET', 'POST'])
 def login_auth():
+    session.pop("error", "")
     form_username = request.form["username"]
     form_password = request.form["password"]
-
-    db, c = sql()
-    # db = sqlite3.connect(DB_FILE)
-    # c = db.cursor()
+    stay_logged_in = "stay_logged_in" in request.form #checks if box has been ticked or not
+    print(f"stay_logged_in: {stay_logged_in}")
 
     print(form_username)
     c.execute("SELECT * FROM users WHERE username = ?", (form_username,))
@@ -91,37 +90,33 @@ def login_auth():
         db_username = user[1]
         db_password = user[2]
 
-        if (form_username == db_username):
-            print("***DIAG: username matches ***")
-            #checks if input for the password form matches with hardcoded password
+        print("***DIAG: username matches ***")
+        #checks if input for the password form matches with hardcoded password
+        if (form_password == db_password):
+            print("***DIAG: password matches ***")
+            #when both coditions are met, password is stored in the cookie and the home page is
+            session["username"] = form_username
+            session["stay_logged_in"] = stay_logged_in
+            session.pop("error", "")
+            return p_redirect("/home")
 
-            if (form_password == db_password):
-                print("***DIAG: password matches ***")
-                #when both coditions are met, password is stored in the cookie and the home page is
-                session["username"] = form_username
-                return p_redirect("/home")
-
-            print("***DIAG: password did not match ***")
-            return p_redirect("/login")
-
-        print("***DIAG: username did not match ***")
+        session["error"] = "Incorrect Password"
+        print("***DIAG: Password did not match ***")
         return p_redirect("/login")
 
-    elif len(users) == 0:
-        print("***DIAG: account does not exist ***")
-        return p_redirect("/login")
 
-    else:
-        return "YOU ARE A FAILURE AT CODING, GET A NEW JOB"
+    session["error"] = "Username does not exist"
+    print("***DIAG: account does not exist ***")
+    return p_redirect("/login")
+
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-    return render_template('register.html')
+    return render_template('register.html', error=session.get("error", ""))
 
 @app.route("/register/auth", methods=['GET', 'POST'])
 def register_auth():
-    db, c = sql()
-
+    session.pop("error", "")
     c.execute("SELECT * FROM users")
     next_available_uid = len(c.fetchall())
     print(next_available_uid)
@@ -135,28 +130,28 @@ def register_auth():
 
     if len(usernames) == 0:
         print("***DIAG: username was available***")
+        session.pop("error", "")
         c.execute("INSERT INTO users(uid, username, password) VALUES(?, ?, ?)", (next_available_uid, username, password))
         c.execute(f"CREATE TABLE uid_{next_available_uid}(title TEXT)")
         db.commit()
         return p_redirect("/login")
 
-    print("***DIAG: username was not available***")
+    session["error"] = "Username is not available"
     return p_redirect("/register")
 
 @app.route("/logout", methods=['GET', 'POST'])
 # this function is called by the logout button when it is pressed on the home page
 def logout():
-    #cookie holding password is removed
-    session.pop("username")
-    print("***DIAG: password removed from cookie ***")
+    #cookie holding username is removed
+    if (session["stay_logged_in"] == False):
+        session.pop("stay_logged_in")
+        session.pop("username")
+        print("***DIAG: username and password removed from cookie ***")
     return p_redirect("/login")
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-    db, c = sql()
-
     # view
-
     uid = find_uid(session["username"])
     c.execute(f"SELECT title FROM uid_{uid}")
     view = c.fetchall()
@@ -176,16 +171,15 @@ def home():
     #filters out stories that user has contributed to from all the stories
     add = list(filter(lambda i: i not in view, add))
 
-    return render_template('home.html', add=add, view=view)
+    return render_template('home.html', add=add, view=view, error=session.get("error", ""))
 
 @app.route("/create", methods=['GET', 'POST'])
 def create():
-    return render_template('create.html')
+    return render_template('create.html', error=session.get("error", ""), title=session.get("title", ""), body=session.get("body", ""))
 
 @app.route("/publish", methods=['GET', 'POST'])
 def publish():
-    db, c = sql()
-
+    session.pop("error", "")
     c.execute("SELECT * FROM stories")
     next_available_sid = len(c.fetchall())
     print(f"next_available_sid: {next_available_sid}") #sid = story id
@@ -222,15 +216,18 @@ def publish():
         return p_redirect("/home")
 
     print("***DIAG: title was not available***")
-    return NOTHING #return statement doing nothing
+    session["error"] = "Title has already been taken"
+    session["title"] = request.form["title"]
+    session["body"] = request.form["body"]
+    return p_redirect("/create")
     # display error syaing title is not unique
 
 
 @app.route("/add", methods=['GET', 'POST'])
 def add():
+    session.pop("error", "")
     title = request.form["title"] #passed in from the hidden form
 
-    db, c = sql()
     c.execute("SELECT * FROM stories WHERE title = ?", (title,))
     info = c.fetchall()[0]
     print(f"info: {info}")
@@ -242,12 +239,11 @@ def add():
 
     print("publisher: {publisher}")
     publisher = info[3]
-    return render_template('add.html', title=title, latest_contribution=latest_contribution, publisher=publisher)
+    return render_template('add.html', title=title, latest_contribution=latest_contribution, publisher=publisher, error=session.get("error", ""))
 
 @app.route("/save", methods=['GET', 'POST'])
 def save():
-    db, c = sql()
-
+    session.pop("error", "")
     contributor = session["username"]
     title = request.form["title"]
     contribution = request.form["contribution"]
@@ -273,8 +269,6 @@ def save():
 @app.route("/view", methods=['GET', 'POST'])
 def view():
     title = request.form["title"] #passed in from the hidden form
-
-    db, c = sql()
     c.execute("SELECT * FROM stories WHERE title = ?", (title,))
     info = c.fetchall()[0]
     print(info)
@@ -282,13 +276,11 @@ def view():
     title = info[1]
     body = info[2]
     publisher = info[3]
-    return render_template('view.html', title=title, body=body, publisher=publisher)
+    return render_template('view.html', title=title, body=body, publisher=publisher, error=session.get("error", ""))
 
 if __name__ == "__main__": #false if this file imported as module
     #enable debugging, auto-restarting of server when this file is modified
     # session.pop("username", None)
-    db, c = sql()
-
     #table storing usernames and passwords
     c.execute("CREATE TABLE IF NOT EXISTS users(uid INT, username TEXT, password TEXT)")
     #table storing info on stories
