@@ -23,8 +23,8 @@
 
     {% for title in add %}
       <form action="/add" method="post">
-        <input type="hidden" name="title" value={{title}}>
-        <input type="submit" name="submit" value={{title}}>
+        <input type="hidden" name="title" value="{{title}}">
+        <input type="submit" name="submit" value="{{title}}">
       </form>
     {% endfor %}
 
@@ -36,8 +36,8 @@
 
     {% for title in view %}
       <form action="/view" method="post">
-        <input type="hidden" name="title" value={{title}}>
-        <input type="submit" name="submit" value={{title}}>
+        <input type="hidden" name="title" value="{{title}}">
+        <input type="submit" name="submit" value="{{title}}">
       </form>
     {% endfor %}
   </body>
