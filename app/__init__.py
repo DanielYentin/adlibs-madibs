@@ -56,8 +56,8 @@ def root():
     print("\n\n\n"),
     print("***DIAG: this Flask obj ***")
     print(app)
+    
     #checks if cookie has username and password stored
-
     if ('stay_logged_in' in session):
         if (session['stay_logged_in'] == True):
             c.execute("SELECT * FROM users WHERE username = ?", (session["username"],))
