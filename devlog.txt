@@ -60,6 +60,7 @@ IvanY DanielY -- 2022-11-11 21:34
 * added contingency check to make sure username stored in session cookie actually exists
 
 IvanY -- 2022-11-11 21:54
+* added new structure for tables user uid and sid
 * added latest updated design doc to repo
 
 IvanY DanielY -- 2022-11-12 21:08
@@ -71,3 +72,18 @@ IvanY DanielY -- 2022-11-13 21:30
 * Removed the sql() function and only opened the database and established the cursor at the beginning of the code
 * Added the option for user to be remembered after logging out on the login screen
 * Added an error system that displays it to the user such as an incorrect password
+
+IvanY -- 2022-11-14 9:20
+* Added sessions usage to the design doc such as holding error, title, body, and username
+* Added usage of helper functions such as find_uid and find_sid
+* Edited out functionality that was inaccurate such as registration and login being on the same page
+
+DanielY -- 2022-11-14 21:30
+* Finished the css for login (login.css)
+
+IvanY -- 2022-11-15 2:30
+* Added prevention of error messages being passed between pages
+* Finished register.class
+* Finished home.class
+* Finished add.class
+* Finished view.class

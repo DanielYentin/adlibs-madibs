@@ -2,17 +2,24 @@
 <html>
   <head>
     <title> VIEW PAGE </title>
+    <link rel="stylesheet" type="text/css" href="../static/css/view.css">
   </head>
 
   <body>
-    <h2> Welcome to the view page. view a new story here!!!<h2> <br>
+    <div class="body-wrapper">
 
-    {{ title }} <br><br>
-    {{ body }} <br><br>
-    BY {{ publisher }}
+    <h1> Welcome to the view page. view a new story here!!!</h1> <br>
+
+    <h2>
+    {{ title }} BY {{ publisher }} <br>
+    </h2>
+    <div class="content">{{ body }}</div>
+
+    <br>
 
     <form action="/home" method="post">
-        <input type="submit" name="submit" value="home">
+        <input type="submit" name="submit" value="Return to Home Page" class="button">
     </form>
+  </div>
   </body>
 </html>

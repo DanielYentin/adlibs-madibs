@@ -153,6 +153,7 @@ def logout():
         session.pop("stay_logged_in")
         session.pop("username")
         print("***DIAG: username and password removed from cookie ***")
+    session.pop("error", "")
     return p_redirect("/login")
 
 @app.route("/home", methods=['GET', 'POST'])
@@ -186,6 +187,8 @@ def create():
 @app.route("/publish", methods=['GET', 'POST'])
 def publish():
     session.pop("error", "")
+    session.pop("title", "")
+    session.pop("body", "")
     c.execute("SELECT * FROM stories")
     next_available_sid = len(c.fetchall())
     print(f"next_available_sid: {next_available_sid}") #sid = story id
