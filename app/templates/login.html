@@ -27,35 +27,32 @@
     <div class="body-wrapper">
       <div class="center">
         <h1 class="title">Adlibs-Madlibs</h1>
-        <div>
+        <div class="login-wrapper">
           <h3 class="login-text">Login into Adlibs-Madlibs</h3>
 
-          <div class="login-wrapper">
+          <div class="form-wrapper">
 
-            <form action="/login/auth" method ='POST'>
-              USERNAME: <input type="text" name="username" placeholder="username" required><br>
-              PASSWORD: <input type="text" name="password" placeholder="password" required><br>
-              Stay logged in? <input type="checkbox" name="stay_logged_in" value="Stay logged in?"><br>
-              <input type="submit" name="submit" value="login">
+            <form action="/login/auth" method ='POST' class="form">
+              <input type="text" name="username" placeholder="Username" required class="field"><br>
+              <input type="text" name="password" placeholder="Password" required class="field"><br>
+              Stay logged in? <input type="checkbox" name="stay_logged_in" class="checkbox"><br><br>
+              <input type="submit" name="submit" value="Login" class="button">
+              <div class="error">
+                {% if error %}
+                  ERROR: {{ error }}
+                {% endif %}
+              </div> <br>
             </form><br>
-
-            <div class="error">
-              {% if error %}
-                ERROR: {{ error }}
-              {% endif %}
-            </div>
-
           </div>
 
           <div>
-            Dont have an account?
             <form action="/register" method ='POST'>
-              <input type="submit" name="submit" value="register">
+              Dont have an account? <br>
+              <input type="submit" name="submit" value="Register" class="button">
             </form>
           </div>
         </div>
       </div>
-
     </div>
   </body>
 </html>
