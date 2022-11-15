@@ -20,31 +20,43 @@
 
   <head>
     <title> REGISTER PAGE </title>
+    <link rel="stylesheet" type="text/css" href="../static/css/register.css">
   </head>
 
   <body>
-    <h1>
-      REGISTER
-    <h1>
-    <h3>
-      Enter a username and password below to proceed.
-    </h3>
-    <div>
-      <form action="/register/auth" method ='POST'>
-        USERNAME: <input type="text" name="username" placeholder="username" required><br>
-        PASSWORD: <input type="text" name="password" placeholder="password" required><br>
-        <input type="submit" name="submit" value="register">
-      </form>
-      <br>
-      {% if error %}
-        ERROR: {{ error }}
-      {% endif %}
-    </div>
-    <div>
-      Already have an account?
-      <form action="/login" method ='POST'>
-        <input type="submit" name="submit" value="login">
-      </form>
+    <div class="body-wrapper">
+      <div class="center">
+        <h1 class="title">
+          JOIN TODAY!
+        </h1>
+            <div class="register-wrapper">
+
+        <h3 class="register-text">
+          Register an account
+        </h3>
+
+        <div class="form-wrapper">
+          <form action="/register/auth" method ='POST' class="form">
+            <input type="text" name="username" placeholder="username" required class="field"><br>
+            <input type="text" name="password" placeholder="password" required class="field"><br>
+            <br>
+            <input type="submit" name="submit" value="Register" class="button">
+          </form>
+            <div class="error">
+            {% if error %}
+              ERROR: {{ error }}
+            {% endif %}
+            </div> <br>
+        </div> <br>
+
+        <div>
+          <form action="/login" method ='POST'>
+            Already have an account?<br>
+            <input type="submit" name="submit" value="Login" class="button">
+          </form>
+        </div>
+        </div>
+      </div>
     </div>
   </body>
 </html>

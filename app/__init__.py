@@ -56,7 +56,7 @@ def root():
     print("\n\n\n"),
     print("***DIAG: this Flask obj ***")
     print(app)
-    
+
     #checks if cookie has username and password stored
     if ('stay_logged_in' in session):
         if (session['stay_logged_in'] == True):
@@ -71,6 +71,9 @@ def root():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    #Prevents errors from carrying over from register page
+    if (session.get("error", "")) == "Username is not available":
+        session.pop("error", "")
     return render_template('login.html', error=session.get("error", ""))
 
 @app.route("/login/auth", methods=['GET', 'POST'])
@@ -112,6 +115,9 @@ def login_auth():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    #Prevents errors from carrying over from login page
+    if (session.get("error", "")) == "Incorrect Password" or (session.get("error", "")) == "Username does not exist" :
+        session.pop("error", "")
     return render_template('register.html', error=session.get("error", ""))
 
 @app.route("/register/auth", methods=['GET', 'POST'])
